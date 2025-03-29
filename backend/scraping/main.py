@@ -15,10 +15,19 @@ def main():
     soup = BeautifulSoup(requests.get(url).text, "html.parser")
     
     company_name = soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip()
-    print(company_name)
+    # print(company_name)
 
-    description_html = soup.find("div", {"class": "core-section-container__content break-words"}).text.strip()
-    print(description_html)
+    description_html = soup.find("div", {"class": "core-section-container__content break-words"})
+    
+    elems = re.split('Description|Basic Qualifications|Preferred Qualifications', description_html.text)
+
+    description = elems[1].strip()
+    basic_qualifications = elems[2].strip()
+    preferred_qualifications = elems[3].strip()
+
+    job = Job(company_name, description, basic_qualifications, preferred_qualifications)
+
+
 
 if __name__ == "__main__":
     main()
