@@ -1,3 +1,12 @@
+"""
+Job class for Scraping backend
+"""
+
+__author__ = "Josh Muszka"
+__email__ = "joshmuszka67@gmail.com"
+__version__ = "1.0.0"
+
+
 class Job:
     company_name = ""
     description = ""

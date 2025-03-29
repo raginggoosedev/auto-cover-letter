@@ -1,3 +1,11 @@
+"""
+Main class for Scraping backend
+"""
+
+__author__ = "Josh Muszka"
+__email__ = "joshmuszka67@gmail.com"
+__version__ = "1.0.0"
+
 import requests
 from bs4 import BeautifulSoup
 import random
