@@ -1,0 +1,10 @@
+[project]
+name = "dataquest-2025-llm"
+version = "0.1.0"
+authors = [
+{name = "Michael Quick", email = "mwquick04@gmail.com"}, {name = "Josh Muszka", email = "josh@jmuszka.com"}
+]
+description = "The LLM backend python for dataquest-2025 project"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
