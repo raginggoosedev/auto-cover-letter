@@ -3,7 +3,7 @@
 
 ### Installation
 
-1. Install uv (linux/mac) `curl -LsSf https://astral.sh/uv/install.sh | sh` (windows) powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+1. Install uv (linux/mac) `curl -LsSf https://astral.sh/uv/install.sh | sh` (windows) `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
 2. Clone repo `git clone git@github.com:raginggoosedev/dataquest-2025.git`
 3. Enter the LLM directory
 
