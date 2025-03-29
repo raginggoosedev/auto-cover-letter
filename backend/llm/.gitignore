@@ -1,2 +1,3 @@
 .venv/
 llm/.env
+.idea/

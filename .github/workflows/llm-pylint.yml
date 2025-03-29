@@ -4,13 +4,9 @@ on:
   push:
     branches:
       - michael
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    # Run the job if this is a push event (already limited to "michael") or a pull request where the head branch is "michael"
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'michael')
     runs-on: ubuntu-latest
     strategy:
       matrix:

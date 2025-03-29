@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from scraping.job import Job
+from backend.scraping.job import Job
 
 load_dotenv()  # Get API key from env
 
