@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from backend.scraping.job import Job
+from scraping.job import Job
 
 load_dotenv()  # Get API key from env
 
@@ -39,13 +39,16 @@ def main():
                 Qualifications: {job.basic_qualifications} {job.preferred_qualifications} \
                 \n\n\n My name is Josh Muszka and I am a 3rd year computer science student at Western University \
                 \n\n Here is the latex template: \n\n \
-                {template} \n\n Please only return the latex with the according information turned in."
+                {template} \n\n Please only return the latex with the according information turned in. If there is any information you can't fill in then make something up"
     )
 
     with open("../latex/resume.tex", "+w") as f:
         f.write(response.output_text.strip("`").removeprefix("latex"))
 
-    subprocess.run(["pdflatex", "../latex/resume.tex", ])
+    read, write = os.pipe() 
+    os.write(write, b"\n")
+    os.close(write)
+    subprocess.run(["xelatex", "../latex/resume.tex", ])
     subprocess.run(["rm", "resume.aux", ])
     subprocess.run(["rm", "resume.log", ])
     subprocess.run(["mv", "resume.pdf", "../latex/resume.pdf"])
