@@ -10,23 +10,32 @@ class Llm:
     """
     load_dotenv()  # Get API key from env
 
+    @classmethod
     def create_prompt(self, job_url, extra_details, letter_style, comments, resume):
         """
         Create a prompt for the LLM based on user input.
         """
+        # Instantiate the Job object to scrape job details from the provided URL
+        job = Job(job_url)
+        job_name = job.company_name
+        job_description = job.description
+        job_basic_qualifications = job.basic_qualifications
+        job_preferred_qualifications = job.preferred_qualifications
         
-        job_description = Job._get_job_api_url_from_job_posting_url(job_url)
-        # Simulate the prompt creation process
+        # Build the prompt by combining the scraped job description with other details
         prompt = (
-            f"Create a raw latex document cover letter for the job at {job_url}.\n"
+            f"Create a raw LaTeX cover letter for the job at {job_name}.\n"
             f"Job Description: {job_description}\n"
             f"Extra Details: {extra_details}\n"
-            f"Structure Style: {letter_style}\n"
-            f"Comments: {comments}\n"
-            f"Resume: {resume}\n"
+            f"Cover Letter Style: {letter_style}\n"
+            f"User Comments: {comments}\n"
+            f"Basic Qualifications: {job_basic_qualifications}\n"
+            f"Preferred Qualifications: {job_preferred_qualifications}\n"
+            f"Resume Content: {resume}\n"
         )
         return prompt
 
+    @classmethod
     def generate(self, prompt):
         """
         Generate a response from the LLM based on the provided prompt."

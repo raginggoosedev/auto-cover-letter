@@ -3,7 +3,10 @@ import io
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from llm.llm import Llm
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
@@ -14,7 +17,7 @@ def hello():
 def generate_cover_letter():
     # Expect form-data information coming from the frontend
     job_url = request.form.get('jobName', '')
-    extra_details = request.form.get('sextraDetails', '')
+    extra_details = request.form.get('extraDetails', '')
     letter_style = request.form.get('letterStyle', '')
     comments = request.form.get('comments', '')
     # resume file is available in request.files if needed:
@@ -25,7 +28,7 @@ def generate_cover_letter():
     cover_letter = Llm.generate(prompt)
 
     # Return the cover letter
-    return jsonify({"coverLetter": cover_letter})
+    return jsonify({"coverLetter": cover_letter.output_text})
 
 @app.route('/compile-latex', methods=['POST'])
 def compile_latex():

@@ -2,3 +2,4 @@ node_modules
 resume.tex
 *.log
 *.pdf
+.env
