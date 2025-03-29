@@ -1,3 +1,4 @@
+# Already included
 node_modules
 resume.tex
 *.log
@@ -6,3 +7,44 @@ resume.tex
 resume.log
 resume.out
 resume.pdf
+
+# Python related
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+venv/
+ENV/
+.venv/
+env/
+
+# LaTeX related files
+*.aux
+temp_resume.pdf
+cover-letter.*
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Frontend build artifacts
+/frontend/build/
+/frontend/coverage/
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+.npm
+.yarn
+
+# Backend temporary files
+**/routes/temp_*
+backend/latex/cover-letter.*

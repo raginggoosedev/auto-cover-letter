@@ -10,20 +10,37 @@ class CompileLatex:
         """
         Compile the LaTeX file into a PDF.
         """
+        # Get current working directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Create file paths with absolute paths
+        tex_path = os.path.join(current_dir, "cover-letter.tex")
+        
         # Write the LaTeX content to a file
-
-        with open("../latex/resume.tex", "+w") as f:
+        with open(tex_path, "w") as f:
             f.write(response.strip("`").removeprefix("latex"))
 
-        # Create a pipe to handle the subprocess output
-        read, write = os.pipe() 
-        os.write(write, b"\n")
-        os.close(write)
-        # Run the xelatex command to compile the LaTeX file
-        subprocess.run(["xelatex", "../latex/resume.tex", ])
-        # Clean up auxiliary files generated during compilation
-        #subprocess.run(["rm", "../latex/resume.aux", ])
-        # Remove the log file generated during compilation
-        #subprocess.run(["rm", "../latex/resume.log", ])
-        # Move the generated PDF to the desired location
-        #subprocess.run(["mv", "resume.pdf", "../latex/resume.pdf"])
+        # Change to the directory where the tex file is located
+        original_dir = os.getcwd()
+        os.chdir(current_dir)
+        
+        try:
+            # Run the xelatex command to compile the LaTeX file
+            result = subprocess.run(
+                ["xelatex", "-interaction=nonstopmode", "cover-letter.tex"],
+                capture_output=True,
+                text=True
+            )
+            
+            # Print output for debugging
+            print("xelatex stdout:", result.stdout)
+            print("xelatex stderr:", result.stderr)
+            
+            if result.returncode != 0:
+                print(f"LaTeX compilation failed with return code {result.returncode}")
+        finally:
+            # Return to original directory
+            os.chdir(original_dir)
+        
+        # Return the path to the generated PDF
+        return os.path.join(current_dir, "cover-letter.pdf")
