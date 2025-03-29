@@ -1,6 +1,8 @@
 # DataQuest-2025 LLM Backend
 ## The OpenAI Backend for our project
 
+![LLM Pylint](https://github.com/raginggoosedev/dataquest-2025/actions/workflows/llm-pylint.yml/badge.svg)
+
 ### Installation
 
 1. Install uv (linux/mac) `curl -LsSf https://astral.sh/uv/install.sh | sh` (windows) `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
