@@ -3,3 +3,6 @@ resume.tex
 *.log
 *.pdf
 .env
+resume.log
+resume.out
+resume.pdf
