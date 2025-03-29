@@ -18,9 +18,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Lint backend/llm using uv and pyproject.toml
-        working-directory: backend/llm/llm
+        working-directory: backend/llm
         run: |
           uv venv
           source .venv/bin/activate
           uv sync
-          uv run pylint .
+          uv run pylint ./llm
