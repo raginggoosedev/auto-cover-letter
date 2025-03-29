@@ -1,0 +1,26 @@
+name: LLM-Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Lint backend/llm using uv and pyproject.toml
+        working-directory: backend/llm
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv sync
+          uv run pylint .
