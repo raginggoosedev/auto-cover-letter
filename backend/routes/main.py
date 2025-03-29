@@ -42,24 +42,44 @@ def compile_latex():
         return jsonify({"error": "No LaTeX content provided"}), 400
 
     try:
-        # Compile the LaTeX content
-        CompileLatex.compile(latex_content)
+        # Automatically provide a newline to simulate pressing Enter during compilation
+        old_stdin = sys.stdin
+        sys.stdin = io.StringIO('\n')
+        try:
+            # Compile the LaTeX content
+            CompileLatex.compile(latex_content)
+        finally:
+            sys.stdin = old_stdin
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    # Construct the absolute path to the generated PDF
-    pdf_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'resume.pdf'))
+    # Define file paths, now expecting that the compilation produces cover-letter.pdf and cover-letter.log
+    base_dir = os.path.dirname(__file__)
+    pdf_path = os.path.abspath(os.path.join(base_dir, 'cover-letter.pdf'))
+    log_path = os.path.abspath(os.path.join(base_dir, 'cover-letter.log'))
     
     if not os.path.exists(pdf_path):
         return jsonify({"error": "PDF file not found. Compilation may have failed."}), 500
 
-    # Return the PDF file to be downloaded
-    return send_file(
+    response = send_file(
         pdf_path,
         mimetype='application/pdf',
         as_attachment=True,
         download_name='cover-letter.pdf'
     )
+
+    # After sending the file, delete temporary files
+    def remove_temp_files():
+        try:
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
+            if os.path.exists(log_path):
+                os.remove(log_path)
+        except Exception as e:
+            print("Error deleting temporary files:", e)
+
+    response.call_on_close(remove_temp_files)
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
