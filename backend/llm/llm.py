@@ -32,6 +32,7 @@ class Llm:
             f"Basic Qualifications: {job_basic_qualifications}\n"
             f"Preferred Qualifications: {job_preferred_qualifications}\n"
             f"Resume Content: {resume}\n"
+            f"Please only return the latex do not include beginning messages or ending messages.\n"
         )
         return prompt
 

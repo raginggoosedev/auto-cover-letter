@@ -63,6 +63,9 @@ function App() {
         },
         body: JSON.stringify({ latex: coverLetter })
       });
+      if (!response.ok) {
+        throw new Error('Compilation failed');
+      }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -75,6 +78,7 @@ function App() {
       console.error('Error compiling PDF:', error);
     }
   };
+  
 
   return (
     <div className="container">
