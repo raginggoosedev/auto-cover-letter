@@ -51,6 +51,15 @@ function App() {
       console.error('Error generating cover letter:', error);
     } finally {
       setLoading(false);
+
+            // Scroll down to download
+            console.log("Begin scrolling");
+            setTimeout(function () {
+              document.getElementById('pdfDownload').scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+              });
+            }, 100);
     }
   };
 
@@ -165,7 +174,7 @@ function App() {
           />
           
           {/* Button to trigger PDF download, shows spinner during PDF creation */}
-          <button 
+          <button id="pdfDownload"
             onClick={handleDownload} 
             disabled={downloadLoading}
             style={{ marginBottom: '30px' }}
