@@ -1,5 +1,5 @@
 [project]
-name = "dataquest-2025-llm"
+name = "dataquest-2025-backend"
 version = "0.1.0"
 authors = [
 {name = "Michael Quick", email = "mwquick04@gmail.com"}, {name = "Josh Muszka", email = "josh@jmuszka.com"}
@@ -18,3 +18,4 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
 ]
+

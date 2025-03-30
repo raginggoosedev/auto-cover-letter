@@ -7,15 +7,13 @@ __email__ = "mwquick04@gmail.com", "nwoo68@gmail.com"
 __version__ = "1.0.0"
 
 import os
-import sys
 
 import PyPDF2
 
 from openai import OpenAI
 from dotenv import load_dotenv
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from scraping.job import Job
+from backend.scraping.job import Job
 
 
 class Llm:

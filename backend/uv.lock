@@ -150,7 +150,7 @@ wheels = [
 ]
 
 [[package]]
-name = "dataquest-2025-llm"
+name = "dataquest-2025-backend"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

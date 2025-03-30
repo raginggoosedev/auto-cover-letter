@@ -3,7 +3,6 @@ Routes cover letter files for website
 """
 
 import os
-import sys
 
 import PyPDF2
 
@@ -11,9 +10,8 @@ from flask_cors import CORS
 
 from flask import Flask, request, jsonify, send_file
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from latex.compile import CompileLatex
-from llm.llm import Llm
+from backend.latex.compile import CompileLatex
+from backend.llm.llm import Llm
 
 app = Flask(__name__)
 CORS(app)
@@ -36,9 +34,15 @@ def generate_cover_letter():
     job_url = request.form.get('jobName', '')
     extra_details = request.form.get('extraDetails', '')
     # letter_style = request.form.get('letterStyle', '')
-    f = open("../latex/format.tex", "r")
-    letter_style = f.read()
-    f.close()
+
+    # Determine the directory where main.py is located
+    current_dir = os.path.dirname(__file__)
+    # Build the absolute path to the latex file
+    format_file_path = os.path.join(current_dir, "..", "latex", "format.tex")
+
+    with open(format_file_path, "r") as f:
+        letter_style = f.read()
+
     comments = request.form.get('comments', '')
 
     # Get resume file from request.files instead of request.form
