@@ -14,7 +14,8 @@ import PyPDF2
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from ..scraping.job import Job
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+from scraping.job import Job
 
 
 class Llm:
@@ -57,7 +58,7 @@ class Llm:
 
         # Build the prompt
         prompt = (
-            f"I need you to help me generate a professional-sounding cover letter for my job application at {job_name}. "
+            f"I need you to help me generate a professional-sounding cover letter for my job application at {job_name}."
             f"I will provide the job description, and the LaTeX template file that I made. I will also provide you my resume."
             f"I want you to fill in the information and tailor the cover letter to the job description, using information from my resume. You will only return the LaTeX source code.\n\n"
             f"Job Description: {job_description}\n\n"
