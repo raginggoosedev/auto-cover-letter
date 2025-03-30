@@ -10,6 +10,7 @@ function App() {
   const [coverLetter, setCoverLetter] = useState('');
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState('');
+  const [downloadLoading, setDownloadLoading] = useState(false);
 
   // Handle file upload
   const handleResumeChange = (event) => {
@@ -55,6 +56,7 @@ function App() {
 
   // Handle download of the cover letter PDF compiled from LaTeX on the backend
   const handleDownload = async () => {
+    setDownloadLoading(true);
     try {
       const response = await fetch('http://localhost:5000/compile-latex', {
         method: 'POST',
@@ -63,6 +65,9 @@ function App() {
         },
         body: JSON.stringify({ latex: coverLetter })
       });
+      if (!response.ok) {
+        throw new Error('Compilation failed');
+      }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -73,8 +78,11 @@ function App() {
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error compiling PDF:', error);
+    } finally {
+      setDownloadLoading(false);
     }
   };
+
 
   return (
     <div className="container">
@@ -124,15 +132,36 @@ function App() {
 
       {/* Display the generated cover letter if available */}
       {coverLetter && (
-        <div className="cover-letter-container">
+        <div className="cover-letter-container" style={{
+          marginTop: '50px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%'
+        }}>
           <h2>Generated Cover Letter (Raw LaTeX)</h2>
           <textarea
             value={coverLetter}
             onChange={(e) => setCoverLetter(e.target.value)}
+            style={{
+              width: '90%',
+              height: '500px',
+              padding: '20px',
+              marginBottom: '20px',
+              fontSize: '16px',
+              lineHeight: '1.5',
+              fontFamily: 'monospace'
+            }}
           />
-          <button onClick={handleDownload}>Download PDF</button>
+         <button 
+            onClick={handleDownload} 
+            disabled={downloadLoading}
+            style={{ marginBottom: '30px' }}
+          >
+            {downloadLoading ? 'Creating PDF...' : 'Download PDF'}
+          </button>
 
-          <div className="comment-box">
+          <div className="comment-box" style={{ width: '90%' }}>
             <label htmlFor="comments">
               <strong>Suggest Edits for Re-generation</strong>
             </label>
@@ -141,9 +170,19 @@ function App() {
               placeholder="Add your comments here..."
               value={comments}
               onChange={(e) => setComments(e.target.value)}
+              style={{
+                width: '100%',
+                height: '150px',
+                padding: '15px',
+                marginTop: '10px',
+                marginBottom: '15px'
+              }}
             />
-            <button onClick={(e) => handleSubmit(e, true)}>
-              Re-generate with Comments
+            <button 
+              onClick={(e) => handleSubmit(e, true)}
+              disabled={loading}
+            >
+              {loading ? 'Re-generating...' : 'Re-generate with Comments'}
             </button>
           </div>
         </div>

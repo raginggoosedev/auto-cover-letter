@@ -21,7 +21,29 @@ load_dotenv()  # Get API key from env
 OpenAI.api_key = os.environ.get("OPENAI_API_KEY")
 client = OpenAI()
 
+def create_prompt(job_url, extra_details, letter_style, comments, resume):
+    """
+    Create a prompt for the LLM based on user input.
+    """
+    
+    job_description = Job._get_job_api_url_from_job_posting_url(job_url)
+    # Simulate the prompt creation process
+    prompt = (
+        f"Create a raw latex document cover letter for the job at {job_url}.\n"
+        f"Job Description: {job_description}\n"
+        f"Extra Details: {extra_details}\n"
+        f"Structure Style: {letter_style}\n"
+        f"Comments: {comments}\n"
+        f"Resume: {resume}\n"
+    )
+    return prompt
 
+def generate(prompt):
+    response = client.responses.create(
+        model="gpt-4o",
+        input=prompt
+    )
+    return response
 def main():
     """
     Main entry point for LLM program.
