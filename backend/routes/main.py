@@ -3,7 +3,6 @@ Routes cover letter files for website
 """
 
 import os
-import sys
 
 import PyPDF2
 
@@ -11,9 +10,8 @@ from flask_cors import CORS
 
 from flask import Flask, request, jsonify, send_file
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from latex.compile import CompileLatex
-from llm.llm import Llm
+from ..latex.compile import CompileLatex
+from ..llm.llm import Llm
 
 app = Flask(__name__)
 CORS(app)

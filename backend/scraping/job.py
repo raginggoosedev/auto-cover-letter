@@ -6,11 +6,10 @@ __author__ = "Josh Muszka"
 __email__ = "joshmuszka67@gmail.com"
 __version__ = "1.0.0"
 
+import re
+
 import requests
 from bs4 import BeautifulSoup
-import random
-import pandas as pd
-import re
 
 
 class Job:

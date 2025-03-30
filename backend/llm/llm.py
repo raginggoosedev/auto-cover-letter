@@ -14,8 +14,7 @@ import PyPDF2
 from openai import OpenAI
 from dotenv import load_dotenv
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from scraping.job import Job
+from ..scraping.job import Job
 
 
 class Llm:

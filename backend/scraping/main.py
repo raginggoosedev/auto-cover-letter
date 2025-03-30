@@ -6,13 +6,12 @@ __author__ = "Josh Muszka"
 __email__ = "joshmuszka67@gmail.com"
 __version__ = "1.0.0"
 
-import requests
-from bs4 import BeautifulSoup
-import random
-import pandas as pd
 import re
 
-from backend.scraping.job import Job
+import requests
+from bs4 import BeautifulSoup
+
+from ..scraping.job import Job
 
 
 def get_job_api_url_from_job_posting_url(url=""):
