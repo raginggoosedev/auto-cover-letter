@@ -84,19 +84,23 @@ function App() {
   };
 
 
+  // Render the main UI component of the Cover Letter Generator app
   return (
     <div className="container">
-      {/* Header and title */}
+      {/* Header and title of the application */}
       <h2>Cover Letter Generator</h2>
+      
+      {/* Form handles resume upload, entering job URL, extra details, and letter style */}
       <form onSubmit={handleSubmit}>
-        {/* File input for resume upload */}
+        {/* File input for uploading a resume document */}
         <input
           type="file"
           accept=".pdf,.doc,.docx"
           onChange={handleResumeChange}
           required
         />
-        {/* Text input for job URL */}
+        
+        {/* Text input for entering the job URL */}
         <input
           type="text"
           placeholder="Enter Job URL"
@@ -104,7 +108,8 @@ function App() {
           onChange={(e) => setJobURL(e.target.value)}
           required
         />
-        {/* Text input for extra details */}
+        
+        {/* Text input for providing any extra details */}
         <input
           type="text"
           placeholder="Enter any extra details you wish to add"
@@ -112,7 +117,8 @@ function App() {
           onChange={(e) => setExtraDetails(e.target.value)}
           required
         />
-        {/* Dropdown for selecting cover letter structure */}
+        
+        {/* Dropdown menu for selecting the cover letter structure style */}
         <label htmlFor="letterStyle"><strong>Select Cover Letter Structure</strong></label>
         <select
           id="letterStyle"
@@ -124,13 +130,14 @@ function App() {
           <option value="creative">Creative</option>
         </select>
 
-        {/* Submit button to generate cover letter */}
+        {/* Submit button to generate cover letter with a spinner when loading */}
         <button type="submit" disabled={loading}>
+          {loading && <div className="spinner"></div>}
           {loading ? 'Generating...' : 'Generate Cover Letter'}
         </button>
       </form>
 
-      {/* Display the generated cover letter if available */}
+      {/* Section to display the generated cover letter if available */}
       {coverLetter && (
         <div className="cover-letter-container" style={{
           marginTop: '50px',
@@ -139,7 +146,10 @@ function App() {
           alignItems: 'center',
           width: '100%'
         }}>
+          {/* Title for the generated cover letter */}
           <h2>Generated Cover Letter (Raw LaTeX)</h2>
+          
+          {/* Textarea to show the LaTeX code for the cover letter, editable for further modifications */}
           <textarea
             value={coverLetter}
             onChange={(e) => setCoverLetter(e.target.value)}
@@ -153,18 +163,25 @@ function App() {
               fontFamily: 'monospace'
             }}
           />
-         <button 
+          
+          {/* Button to trigger PDF download, shows spinner during PDF creation */}
+          <button 
             onClick={handleDownload} 
             disabled={downloadLoading}
             style={{ marginBottom: '30px' }}
           >
+            {downloadLoading && <div className="spinner"></div>}
             {downloadLoading ? 'Creating PDF...' : 'Download PDF'}
           </button>
 
+          {/* Section for suggesting edits when re-generating the cover letter */}
           <div className="comment-box" style={{ width: '90%' }}>
+            {/* Label for the comments textarea */}
             <label htmlFor="comments">
               <strong>Suggest Edits for Re-generation</strong>
             </label>
+            
+            {/* Textarea for adding comments/suggestions */}
             <textarea
               id="comments"
               placeholder="Add your comments here..."
@@ -178,10 +195,13 @@ function App() {
                 marginBottom: '15px'
               }}
             />
+            
+            {/* Button to re-generate the cover letter using the provided comments */}
             <button 
               onClick={(e) => handleSubmit(e, true)}
               disabled={loading}
             >
+              {loading && <div className="spinner"></div>}
               {loading ? 'Re-generating...' : 'Re-generate with Comments'}
             </button>
           </div>
