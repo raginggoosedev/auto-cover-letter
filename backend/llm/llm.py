@@ -57,15 +57,19 @@ class Llm:
 
         # Build the prompt
         prompt = (
-            f"Create a raw LaTeX cover letter for the job at {job_name}.\n"
-            f"Job Description: {job_description}\n"
-            f"Extra Details: {extra_details}\n"
-            f"Cover Letter Style: {letter_style}\n"
-            f"User Comments: {comments}\n"
-            f"Basic Qualifications: {job_basic_qualifications}\n"
-            f"Preferred Qualifications: {job_preferred_qualifications}\n"
-            f"Resume Content: {resume_content}\n"
+            f"I need you to help me generate a professional-sounding cover letter for my job application at {job_name}. "
+            f"I will provide the job description, and the LaTeX template file that I made. I will also provide you my resume."
+            f"I want you to fill in the information and tailor the cover letter to the job description, using information from my resume. You will only return the LaTeX source code.\n\n"
+            f"Job Description: {job_description}\n\n"
+            f"Extra Details: {extra_details}\n\n"
+            f"Cover Letter Style (it IS CRUCIAL that you follow EXACTLY this format): {letter_style}\n\n"
+            f"User Comments: {comments}\n\n"
+            f"Basic Qualifications: {job_basic_qualifications}\n\n"
+            f"Preferred Qualifications: {job_preferred_qualifications}\n\n"
+            f"Resume Content: {resume_content}\n\n"
             f"Only return the latex do not include beginning messages or ending messages.\n"
+            f"If you can't determine the job position then simply put Software Developer, if there is no recruiter then simply put Recruiter."
+            f"Do not, under any circumstances, leave any information unfilled. You may extrapolate information, and make it sound as professional and human-like as possible."
         )
         return prompt
 

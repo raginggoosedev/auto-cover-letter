@@ -33,7 +33,10 @@ def generate_cover_letter():
     # Expect form-data information coming from the frontend
     job_url = request.form.get('jobName', '')
     extra_details = request.form.get('extraDetails', '')
-    letter_style = request.form.get('letterStyle', '')
+    # letter_style = request.form.get('letterStyle', '')
+    f = open("../latex/format.tex", "r")
+    letter_style = f.read()
+    f.close()
     comments = request.form.get('comments', '')
 
     # Get resume file from request.files instead of request.form
