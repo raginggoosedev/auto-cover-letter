@@ -28,10 +28,12 @@ class Job:
         description_html = soup.find("div", {"class": "core-section-container__content break-words"})
 
         elems = re.split('Description|Basic Qualifications|Preferred Qualifications', description_html.text)
+        
+        if len(elems) >= 2: self.description = elems[1].strip()
+        if len(elems) >= 3: self.basic_qualifications = elems[2].strip()
+        if len(elems) >= 4: self.preferred_qualifications = elems[3].strip()
 
-        self.description = elems[1].strip()
-        # self.basic_qualifications = elems[2].strip()
-        # self.preferred_qualifications = elems[3].strip()
+        if len(elems) == 0: self.description = elems[0].strip()
 
     def _get_job_api_url_from_job_posting_url(self, url=""):
         # Check if job post URL is valid and convert to an API url
