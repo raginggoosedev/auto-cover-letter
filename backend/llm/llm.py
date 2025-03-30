@@ -1,9 +1,22 @@
+"""
+Main class for LLM backend
+"""
+
+__author__ = "Michael Quick", "Nicholas Woo"
+__email__ = "mwquick04@gmail.com", "nwoo68@gmail.com"
+__version__ = "1.0.0"
+
+import os
+import sys
+
+import PyPDF2
+
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from scraping.job import Job
-import PyPDF2
+
 
 class Llm:
     """
@@ -12,7 +25,7 @@ class Llm:
     load_dotenv()  # Get API key from env
 
     @classmethod
-    def create_prompt(self, job_url, extra_details, letter_style, comments, resume):
+    def create_prompt(cls, job_url, extra_details, letter_style, comments, resume):
         """
         Create a prompt for the LLM based on user input.
         Resume can be either a file path or the extracted text content.
@@ -58,11 +71,11 @@ class Llm:
         return prompt
 
     @classmethod
-    def generate(self, prompt):
+    def generate(cls, prompt):
         """
         Generate a response from the LLM based on the provided prompt."
         """
-        
+
         OpenAI.api_key = os.environ.get("OPENAI_API_KEY")
         client = OpenAI()
         response = client.responses.create(

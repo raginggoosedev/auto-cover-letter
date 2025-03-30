@@ -12,6 +12,9 @@ import random
 import pandas as pd
 import re
 
+from backend.scraping.job import Job
+
+
 def get_job_api_url_from_job_posting_url(url=""):
     # Check if job post URL is valid and convert to an API url
     pattern = re.compile("^https://www.linkedin.com/jobs/view/[0-9]+")
