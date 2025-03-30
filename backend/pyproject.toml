@@ -1,17 +1,21 @@
 [project]
-name = "dataquest-2025-llm"
+name = "dataquest-2025-backend"
 version = "0.1.0"
 authors = [
 {name = "Michael Quick", email = "mwquick04@gmail.com"}, {name = "Josh Muszka", email = "josh@jmuszka.com"}
 ]
-description = "The LLM backend python for dataquest-2025 project"
+description = "The backend python for dataquest-2025 project"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "bs4>=0.0.2",
+    "flask>=3.1.0",
+    "flask-cors>=5.0.1",
     "openai>=1.69.0",
     "pandas>=2.2.3",
     "pylint>=3.3.6",
+    "pypdf2>=3.0.1",
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
 ]
+

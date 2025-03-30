@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - michael
+      - main
 
 jobs:
   build:
@@ -20,10 +21,13 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Lint backend/llm using uv and pyproject.toml
-        working-directory: backend/llm
+      - name: Lint backend using uv and pyproject.toml
+        working-directory: backend
         run: |
           uv venv
           source .venv/bin/activate
           uv sync
           uv run pylint ./llm
+          uv run pylint ./routes
+          uv run pylint ./scraping
+          uv run pylint ./latex
