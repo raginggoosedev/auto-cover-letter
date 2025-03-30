@@ -64,7 +64,7 @@ def generate_cover_letter():
 
                 # Clean up the temporary file
                 os.remove(temp_file_path)
-            except Exception as e:
+            except IOError as e:
                 print(f"Error processing resume: {e}")
 
     prompt = Llm.create_prompt(job_url, extra_details, letter_style, comments, resume_text)
@@ -111,13 +111,13 @@ def compile_latex():
                     os.remove(log_path)
                 if os.path.exists(aux_path):
                     os.remove(aux_path)
-            except Exception as e:
+            except IOError as e:
                 print("Error deleting temporary files:", e)
 
         response.call_on_close(remove_temp_files)
         return response
 
-    except Exception as e:
+    except IOError as e:
         print(f"Exception during PDF compilation: {e}")
         return jsonify({"error": str(e)}), 500
 

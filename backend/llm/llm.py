@@ -46,7 +46,7 @@ class Llm:
                         for page in reader.pages:
                             text = page.extract_text() or ""
                             resume_content += text + "\n"
-                except Exception as e:
+                except IOError as e:
                     resume_content = f"Error reading PDF: {e}"
             else:
                 # Resume is already text content
@@ -56,19 +56,27 @@ class Llm:
 
         # Build the prompt
         prompt = (
-            f"I need you to help me generate a professional-sounding cover letter for my job application at {job_name}."
-            f"I will provide the job description, and the LaTeX template file that I made. I will also provide you my resume."
-            f"I want you to fill in the information and tailor the cover letter to the job description, using information from my resume. You will only return the LaTeX source code.\n\n"
+            f"I need you to help me generate a professional-sounding cover letter for my "
+            f"job application at {job_name}. "
+            f"I will provide the job description, and the LaTeX template file that I made. "
+            f"I will also provide you my resume. "
+            f"I want you to fill in the information and tailor the cover letter to the job "
+            f"description, using information from my resume. You will only return the LaTeX "
+            f"source code.\n\n"
             f"Job Description: {job_description}\n\n"
             f"Extra Details: {extra_details}\n\n"
-            f"Cover Letter Style (it IS CRUCIAL that you follow EXACTLY this format): {letter_style}\n\n"
+            f"Cover Letter Style (it IS CRUCIAL that you follow EXACTLY this format): "
+            f"{letter_style}\n\n"
             f"User Comments: {comments}\n\n"
             f"Basic Qualifications: {job_basic_qualifications}\n\n"
             f"Preferred Qualifications: {job_preferred_qualifications}\n\n"
             f"Resume Content: {resume_content}\n\n"
             f"Only return the latex do not include beginning messages or ending messages.\n"
-            f"If you can't determine the job position then simply put Software Developer, if there is no recruiter then simply put Recruiter."
-            f"Do not, under any circumstances, leave any information unfilled. You may extrapolate information, and make it sound as professional and human-like as possible."
+            f"If you can't determine the job position then simply put Software Developer, "
+            f"if there is no recruiter then simply put Recruiter. "
+            f"Do not, under any circumstances, leave any information unfilled. "
+            f"You may extrapolate information, and make it sound as professional and human-like "
+            f"as possible."
         )
         return prompt
 
