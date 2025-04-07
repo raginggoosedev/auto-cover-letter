@@ -20,7 +20,8 @@ class Llm:
     """
     Class to interact with OpenAI's API for generating cover letters.
     """
-    load_dotenv()  # Get API key from env
+    
+    load_dotenv('/var/www/html/dataquest-2025/backend/llm/.env') # Get API key from env
 
     @classmethod
     def create_prompt(cls, job_url, extra_details, letter_style, comments, resume):
@@ -58,7 +59,7 @@ class Llm:
         prompt = (
             f"I need you to help me generate a professional-sounding cover letter for my "
             f"job application at {job_name}. "
-            f"I will provide the job description, and the LaTeX template file that I made. "
+            f"I will provide the job description, and the LaTeX template file that I made the font for the latex file should be Linux Libertine O font"
             f"I will also provide you my resume. "
             f"I want you to fill in the information and tailor the cover letter to the job "
             f"description, using information from my resume. You will only return the LaTeX "
@@ -86,8 +87,7 @@ class Llm:
         Generate a response from the LLM based on the provided prompt."
         """
 
-        OpenAI.api_key = os.environ.get("OPENAI_API_KEY")
-        client = OpenAI()
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         response = client.responses.create(
             model="gpt-4o-mini",
             input=prompt

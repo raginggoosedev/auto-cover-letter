@@ -41,7 +41,7 @@ function App() {
 
     // Send the form data to the backend for processing
     try {
-      const response = await fetch('http://localhost:5000/generate-cover-letter', {
+      const response = await fetch('/api/generate-cover-letter', {
         method: 'POST',
         body: formData,
       });
@@ -67,7 +67,7 @@ function App() {
   const handleDownload = async () => {
     setDownloadLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/compile-latex', {
+      const response = await fetch('/api/compile-latex', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

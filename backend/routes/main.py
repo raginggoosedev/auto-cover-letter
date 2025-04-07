@@ -40,7 +40,7 @@ def generate_cover_letter():
     # Build the absolute path to the latex file
     format_file_path = os.path.join(current_dir, "..", "latex", "format.tex")
 
-    with open(format_file_path, "r") as f:
+    with open(format_file_path, "r", encoding="utf-8") as f:
         letter_style = f.read()
 
     comments = request.form.get('comments', '')
