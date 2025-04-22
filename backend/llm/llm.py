@@ -13,7 +13,7 @@ import PyPDF2
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from backend.scraping.job import Job
+from scraping.job import Job
 
 
 class Llm:
@@ -59,7 +59,8 @@ class Llm:
         prompt = (
             f"I need you to help me generate a professional-sounding cover letter for my "
             f"job application at {job_name}. "
-            f"I will provide the job description, and the LaTeX template file that I made the font for the latex file should be Linux Libertine O font"
+            f"I will provide the job description, "
+            # f"and the LaTeX template file that I made the font for the latex file should be Linux Libertine O font"
             f"I will also provide you my resume. "
             f"I want you to fill in the information and tailor the cover letter to the job "
             f"description, using information from my resume. You will only return the LaTeX "
@@ -78,6 +79,7 @@ class Llm:
             f"Do not, under any circumstances, leave any information unfilled. "
             f"You may extrapolate information, and make it sound as professional and human-like "
             f"as possible."
+            f"Do not, UNDER ANY CIRCUMSTANCES, change anything about the LaTeX template provided. Simply fill in the information"
         )
         return prompt
 

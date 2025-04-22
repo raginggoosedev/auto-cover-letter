@@ -41,11 +41,12 @@ function App() {
 
     // Send the form data to the backend for processing
     try {
-      const response = await fetch('/api/generate-cover-letter', {
+      const response = await fetch('http://localhost:5000/generate-cover-letter', {
         method: 'POST',
         body: formData,
       });
       const data = await response.json();
+      // console.log(data);
       setCoverLetter(data.coverLetter);
     } catch (error) {
       console.error('Error generating cover letter:', error);
@@ -67,7 +68,7 @@ function App() {
   const handleDownload = async () => {
     setDownloadLoading(true);
     try {
-      const response = await fetch('/api/compile-latex', {
+      const response = await fetch('http://localhost:5000/compile-latex', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
