@@ -2,6 +2,9 @@
 Complies LaTex files into PDF
 """
 
+# Disable pylint for too few public methods
+# pylint: disable=R0903
+
 import os
 import subprocess
 
@@ -36,7 +39,7 @@ class CompileLatex:
                 ["xelatex", "-interaction=nonstopmode", "cover-letter.tex"],
                 capture_output=True,
                 text=True,
-                encoding="utf-8", 
+                encoding="utf-8",
                 check=False,
             )
 
