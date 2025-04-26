@@ -29,54 +29,75 @@ def hello():
     return 'Hello, World!'
 
 
+def parse_resume(uploaded_file) -> str:
+    """
+    Given a werkzeug FileStorage for a PDF resume, extract text,
+    force ASCII only, and return the clean string.
+    """
+
+    # save to temp
+    tmp = os.path.join(os.path.dirname(__file__), 'temp_resume.pdf')
+    uploaded_file.save(tmp)
+
+    text_accum = []
+    try:
+        with open(tmp, 'rb') as pdf_file:
+            reader = PyPDF2.PdfReader(pdf_file)
+            for page in reader.pages:
+                raw = page.extract_text() or ""
+                # normalize → ascii
+                clean = raw.encode('ascii', 'ignore').decode('ascii')
+                text_accum.append(clean)
+    finally:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+
+    return "\n".join(text_accum)
+
+
+def load_letter_style() -> str:
+    """
+    Load the letter style from the format.tex latex file
+    """
+    here = os.path.dirname(__file__)
+    fmt = os.path.join(here, "..", "latex", "format.tex")
+    with open(fmt, "r", encoding="utf-8") as f:
+        return f.read()
+
+
 @app.route('/generate-cover-letter', methods=['POST'])
 def generate_cover_letter():
     """
-    Generates a cover letter
+    Generate the cover letter by collecting the information from the resume,
+    job description, and extras, and sending the LLM a prompt
     """
-    # Expect form-data information coming from the frontend
+
     job_url = request.form.get('jobName', '')
     extra_details = request.form.get('extraDetails', '')
-    # letter_style = request.form.get('letterStyle', '')
-
-    # Determine the directory where main.py is located
-    current_dir = os.path.dirname(__file__)
-    # Build the absolute path to the latex file
-    format_file_path = os.path.join(current_dir, "..", "latex", "format.tex")
-
-    with open(format_file_path, "r", encoding="utf-8") as f:
-        letter_style = f.read()
-
     comments = request.form.get('comments', '')
+    letter_style = load_letter_style()
 
-    # Get resume file from request.files instead of request.form
     resume_text = ""
-    if 'resume' in request.files:
-        resume_file = request.files['resume']
-        if resume_file.filename != '':
-            # Create a temporary file to save the uploaded resume
-            temp_file_path = os.path.join(os.path.dirname(__file__), 'temp_resume.pdf')
-            resume_file.save(temp_file_path)
+    if 'resume' in request.files and request.files['resume'].filename:
+        resume_text = parse_resume(request.files['resume'])
 
-            try:
-                # Extract text from PDF
-                with open(temp_file_path, "rb") as pdf_file:
-                    reader = PyPDF2.PdfReader(pdf_file)
-                    for page in reader.pages:
-                        # Force ascii encoding to remove erroneous special characters
-                        text = page.extract_text().encode('ascii', 'ignore').decode('ascii') or ""
-                        resume_text += text + "\n"
-
-                # Clean up the temporary file
-                os.remove(temp_file_path)
-            except IOError as e:
-                print(f"Error processing resume: {e}")
-
-    prompt = Llm.create_prompt(job_url, extra_details, letter_style, comments, resume_text)
+    prompt = Llm.create_prompt(
+        job_url,
+        extra_details,
+        letter_style,
+        comments,
+        resume_text
+    )
     cover_letter = Llm.generate(prompt)
 
-    # Return the cover letter
-    return jsonify({"coverLetter": cover_letter.output_text.strip("`").removeprefix("latex")})
+    return jsonify({
+        "coverLetter": cover_letter
+        .output_text
+        .strip("`")
+        .removeprefix("latex")
+    })
 
 
 @app.route('/compile-latex', methods=['POST'])
