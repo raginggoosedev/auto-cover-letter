@@ -6,6 +6,9 @@ __author__ = "Michael Quick", "Nicholas Woo"
 __email__ = "mwquick04@gmail.com", "nwoo68@gmail.com"
 __version__ = "1.0.0"
 
+# Disable pylint for line length, and too many argument warnings
+# pylint: disable=C0301,R0913,R0917
+
 import os
 
 import PyPDF2
@@ -20,8 +23,25 @@ class Llm:
     """
     Class to interact with OpenAI's API for generating cover letters.
     """
-    
-    load_dotenv('/var/www/html/dataquest-2025/backend/llm/.env') # Get API key from env
+
+    @staticmethod
+    def _extract_resume(resume):
+        """
+        Extract text from a PDF path or return raw text.
+        """
+        if resume and isinstance(resume, str) and os.path.isfile(resume):
+            try:
+                content = []
+                with open(resume, 'rb') as pdf_file:
+                    reader = PyPDF2.PdfReader(pdf_file)
+                    for pg in reader.pages:
+                        content.append(pg.extract_text() or '')
+                return '\n'.join(content)
+            except IOError as err:
+                return f'Error reading PDF: {err}'
+        return resume or ''
+
+    load_dotenv('/var/www/html/dataquest-2025/backend/llm/.env')  # Get API key from env
 
     @classmethod
     def create_prompt(cls, job_url, extra_details, letter_style, comments, resume):
@@ -36,22 +56,7 @@ class Llm:
         job_basic_qualifications = job.basic_qualifications
         job_preferred_qualifications = job.preferred_qualifications
 
-        # Determine resume content based on input type
-        resume_content = ""
-        if resume:
-            if isinstance(resume, str) and os.path.isfile(resume):
-                # Handle case where resume is a file path
-                try:
-                    with open(resume, "rb") as pdf_file:
-                        reader = PyPDF2.PdfReader(pdf_file)
-                        for page in reader.pages:
-                            text = page.extract_text() or ""
-                            resume_content += text + "\n"
-                except IOError as e:
-                    resume_content = f"Error reading PDF: {e}"
-            else:
-                # Resume is already text content
-                resume_content = resume
+        resume_content = cls._extract_resume(resume)
 
         print("Final resume content:", resume_content)
 
@@ -79,7 +84,7 @@ class Llm:
             f"Do not, under any circumstances, leave any information unfilled. "
             f"You may extrapolate information, and make it sound as professional and human-like "
             f"as possible."
-            f"Do not change anything about the LaTeX template provided unless a comment instructs you to do so (such as to remove a line which doesn't have its information provided). Simply fill in the information"
+            f"Do not change anything about the LaTeX template provided unless a comment instructs you to do so (such as to remove a line which doesn't have its information provided)."
         )
         return prompt
 
