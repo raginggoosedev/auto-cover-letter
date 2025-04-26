@@ -2,6 +2,10 @@
 Routes cover letter files for website
 """
 
+__author__ = "Michael Quick", "Nicholas Woo"
+__email__ = "mwquick04@gmail.com", "nwoo68@gmail.com"
+__version__ = "1.0.0"
+
 import os
 
 import PyPDF2
@@ -59,7 +63,8 @@ def generate_cover_letter():
                 with open(temp_file_path, "rb") as pdf_file:
                     reader = PyPDF2.PdfReader(pdf_file)
                     for page in reader.pages:
-                        text = page.extract_text() or ""
+                        # Force ascii encoding to remove erroneous special characters
+                        text = page.extract_text().encode('ascii', 'ignore').decode('ascii') or ""
                         resume_text += text + "\n"
 
                 # Clean up the temporary file

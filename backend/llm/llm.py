@@ -79,7 +79,7 @@ class Llm:
             f"Do not, under any circumstances, leave any information unfilled. "
             f"You may extrapolate information, and make it sound as professional and human-like "
             f"as possible."
-            f"Do not, UNDER ANY CIRCUMSTANCES, change anything about the LaTeX template provided. Simply fill in the information"
+            f"Do not change anything about the LaTeX template provided unless a comment instructs you to do so (such as to remove a line which doesn't have its information provided). Simply fill in the information"
         )
         return prompt
 
