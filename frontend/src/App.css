@@ -1,3 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-500: #acc4c355;
+  --color-secondary-500: rgba(255, 255, 255, 0.3);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -9,7 +16,7 @@ body {
   padding: 0;
 }
 
-.container {
+/*.container {
   padding: 20px;
   max-width: 600px;
   margin: 40px auto;
@@ -18,7 +25,7 @@ body {
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
   border: solid 3px #0c343d55;
   color: #0c343d;
-}
+}*/
 
 h2 {
   text-align: center;
@@ -72,13 +79,18 @@ textarea {
   width: 20px;
   height: 20px;
   margin-right: 8px;
-  border: 3px solid rgba(255,255,255,0.3);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top: 3px solid #fff;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
