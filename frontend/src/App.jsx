@@ -102,7 +102,7 @@ function App() {
         <div class="w-full max-w-md">
           <div class="flex justify-center mx-auto">
             {/* Header and title of the application */}
-            <h2 class="mt-3 text-4xl text-center text-gray-600 dark:text-gray-200">Cover Letter Generator</h2>
+            <h2 class="mt-3 mb-3 text-4xl text-center text-gray-800 dark:text-gray-800">Cover Letter Generator</h2>
           </div>
           {/* Form handles resume upload, entering job URL, extra details, and letter style */}
           <form onSubmit={handleSubmit}>
@@ -146,7 +146,7 @@ function App() {
             </select>
 
             {/* Submit button to generate cover letter with a spinner when loading */}
-            <div class="mt-6">
+            <div class="mt-6 mb-6">
               <button type="submit" class="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-button-500 rounded-lg hover:bg-button-600 focus:outline-none focus:ring focus:ring-button-400 focus:ring-opacity-50" disabled={loading}>
                 {loading && <div className="inline-block w-5 h-5 mr-2 border-3 border-secondary-500 border-opacity-30 rounded-full border-t-white animate-spin"></div>
                 }
@@ -158,33 +158,19 @@ function App() {
 
           {/* Section to display the generated cover letter if available */}
           {coverLetter && (
-            <div className="cover-letter-container" style={{
-              marginTop: '50px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              width: '100%'
-            }}>
+            <div class="mb-6">
               {/* Title for the generated cover letter */}
-              <h2>Generated Cover Letter (Raw LaTeX)</h2>
+              <h2 class="text-lg text-center mb-3 text-gray-800">Generated Cover Letter (Raw LaTeX)</h2>
 
               {/* Textarea to show the LaTeX code for the cover letter, editable for further modifications */}
               <textarea
                 value={coverLetter}
                 onChange={(e) => setCoverLetter(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '500px',
-                  padding: '20px',
-                  marginBottom: '20px',
-                  fontSize: '16px',
-                  lineHeight: '1.5',
-                  fontFamily: 'monospace'
-                }}
+                class="w-full h-96 p-5 mb-5 text-base font-mono"
               />
 
               {/* Button to trigger PDF download, shows spinner during PDF creation */}
-              
+
               <button id="pdfDownload" class="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-button-500 rounded-lg hover:bg-button-600 focus:outline-none focus:ring focus:ring-button-400 focus:ring-opacity-50 mb-5"
                 onClick={handleDownload}
                 disabled={downloadLoading}
@@ -194,25 +180,19 @@ function App() {
               </button>
 
               {/* Section for suggesting edits when re-generating the cover letter */}
-              <div className="comment-box" style={{ width: '100%' }}>
+              <div>
                 {/* Label for the comments textarea */}
                 <label htmlFor="comments">
-                  <strong>Suggest Edits for Re-generation</strong>
+                  <h2 class="text-lg text-center mb-3 text-gray-800">Suggest Edits for Re-generation</h2>
                 </label>
 
                 {/* Textarea for adding comments/suggestions */}
                 <textarea
+                  class="w-full h-40 p-5 mb-5"
                   id="comments"
                   placeholder="Add your comments here..."
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
-                  style={{
-                    width: '100%',
-                    height: '150px',
-                    padding: '15px',
-                    marginTop: '10px',
-                    marginBottom: '15px'
-                  }}
                 />
 
                 {/* Button to re-generate the cover letter using the provided comments */}
