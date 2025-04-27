@@ -3,6 +3,9 @@
 @theme {
   --color-primary-500: #acc4c355;
   --color-secondary-500: rgba(255, 255, 255, 0.3);
+  --color-button-400: #588E99;
+  --color-button-500: #45818e;
+  --color-button-600: #3E7480;
 }
 
 html {
@@ -54,7 +57,6 @@ button {
   justify-content: center;
   padding: 10px 16px;
   font-size: 16px;
-  background-color: #45818e;
   color: white;
   border: none;
   border-radius: 4px;

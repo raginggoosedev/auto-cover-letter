@@ -146,11 +146,14 @@ function App() {
             </select>
 
             {/* Submit button to generate cover letter with a spinner when loading */}
-            <button type="submit" disabled={loading}>
-              {loading && <div className="inline-block w-5 h-5 mr-2 border-3 border-secondary-500 border-opacity-30 rounded-full border-t-white animate-spin"></div>
-              }
-              {loading ? 'Generating...' : 'Generate Cover Letter'}
-            </button>
+            <div class="mt-6">
+              <button type="submit" class="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-button-500 rounded-lg hover:bg-button-600 focus:outline-none focus:ring focus:ring-button-400 focus:ring-opacity-50" disabled={loading}>
+                {loading && <div className="inline-block w-5 h-5 mr-2 border-3 border-secondary-500 border-opacity-30 rounded-full border-t-white animate-spin"></div>
+                }
+                {loading ? 'Generating...' : 'Generate Cover Letter'}
+              </button>
+
+            </div>
           </form>
 
           {/* Section to display the generated cover letter if available */}
@@ -170,7 +173,7 @@ function App() {
                 value={coverLetter}
                 onChange={(e) => setCoverLetter(e.target.value)}
                 style={{
-                  width: '90%',
+                  width: '100%',
                   height: '500px',
                   padding: '20px',
                   marginBottom: '20px',
@@ -181,17 +184,17 @@ function App() {
               />
 
               {/* Button to trigger PDF download, shows spinner during PDF creation */}
-              <button id="pdfDownload"
+              
+              <button id="pdfDownload" class="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-button-500 rounded-lg hover:bg-button-600 focus:outline-none focus:ring focus:ring-button-400 focus:ring-opacity-50 mb-5"
                 onClick={handleDownload}
                 disabled={downloadLoading}
-                style={{ marginBottom: '30px' }}
               >
                 {downloadLoading && <div className="inline-block w-5 h-5 mr-2 border-3 border-secondary-500 border-opacity-30 rounded-full border-t-white animate-spin"></div>}
                 {downloadLoading ? 'Creating PDF...' : 'Download PDF'}
               </button>
 
               {/* Section for suggesting edits when re-generating the cover letter */}
-              <div className="comment-box" style={{ width: '90%' }}>
+              <div className="comment-box" style={{ width: '100%' }}>
                 {/* Label for the comments textarea */}
                 <label htmlFor="comments">
                   <strong>Suggest Edits for Re-generation</strong>
@@ -213,7 +216,7 @@ function App() {
                 />
 
                 {/* Button to re-generate the cover letter using the provided comments */}
-                <button
+                <button class="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-button-500 rounded-lg hover:bg-button-600 focus:outline-none focus:ring focus:ring-button-400 focus:ring-opacity-50 mb-5"
                   onClick={(e) => handleSubmit(e, true)}
                   disabled={loading}
                 >
@@ -223,6 +226,7 @@ function App() {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </section>
