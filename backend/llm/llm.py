@@ -84,7 +84,7 @@ class Llm:
             f"Do not, under any circumstances, leave any information unfilled. "
             f"You may extrapolate information, and make it sound as professional and human-like "
             f"as possible."
-            f"Do not change anything about the LaTeX template provided unless a comment instructs you to do so (such as to remove a line which doesn't have its information provided)."
+            f"Follow the comments provided in the latex format, otherwise do not deviate from the format. Simply fill in information if provided. Do not leave anything surrounded with square brackets; such lines should either be removed if no information is provided"
         )
         return prompt
 
