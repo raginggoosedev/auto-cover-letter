@@ -90,6 +90,38 @@ test('surfaces API validation errors', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent(/valid https linkedin/i);
 });
 
+test('regenerates with feedback and preserves the original context', async () => {
+  fetch
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ coverLetter: 'first draft' }),
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ coverLetter: 'revised draft' }),
+    });
+  render(<App />);
+  fillRequiredFields();
+  fireEvent.change(screen.getByLabelText(/extra details/i), {
+    target: { value: 'Built internal tools' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /generate cover letter/i }));
+  await screen.findByDisplayValue('first draft');
+  fireEvent.change(screen.getByLabelText(/revision instructions/i), {
+    target: { value: 'Make the opening shorter' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: /regenerate with feedback/i }));
+
+  expect(await screen.findByDisplayValue('revised draft')).toBeInTheDocument();
+  expect(fetch).toHaveBeenCalledTimes(2);
+  const secondRequest = fetch.mock.calls[1];
+  expect(secondRequest[0]).toBe('/api/generate-cover-letter');
+  expect(secondRequest[1].body.get('comments')).toBe('Make the opening shorter');
+  expect(secondRequest[1].body.get('extraDetails')).toBe('Built internal tools');
+  expect(secondRequest[1].body.get('resume').name).toBe('resume.pdf');
+});
+
 test('rejects a non-PDF resume before calling the API', () => {
   render(<App />);
   const documentFile = new File(['resume'], 'resume.docx', {
