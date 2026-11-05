@@ -4,6 +4,7 @@ resume.tex
 *.log
 *.pdf
 .env
+.coverage
 resume.log
 resume.out
 resume.pdf
@@ -37,6 +38,7 @@ Thumbs.db
 
 # Frontend build artifacts
 /frontend/build/
+/frontend/dist/
 /frontend/coverage/
 /frontend/.env.local
 /frontend/.env.development.local

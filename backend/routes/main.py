@@ -1,152 +1,172 @@
-"""
-Routes cover letter files for website
-"""
+"""HTTP API for generating and compiling cover letters."""
 
-__author__ = "Michael Quick", "Nicholas Woo"
-__email__ = "mwquick04@gmail.com", "nwoo68@gmail.com"
-__version__ = "1.0.0"
-
+from io import BytesIO
 import os
+from pathlib import Path
 
-import PyPDF2
-
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
+from openai import OpenAIError
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
+from werkzeug.exceptions import RequestEntityTooLarge
 
-from flask import Flask, request, jsonify, send_file
+from backend.latex.compile import CompileLatex, LatexCompilationError
+from backend.llm.llm import (
+    CoverLetterContext,
+    Llm,
+    LlmConfigurationError,
+    LlmGenerationError,
+)
+from backend.scraping.job import Job, JobScrapingError, UnsupportedJobUrl
 
-from latex.compile import CompileLatex
-from llm.llm import Llm
+MAX_RESUME_BYTES = 5 * 1024 * 1024
+SUPPORTED_TONES = frozenset(Llm.TONE_GUIDANCE)
 
 app = Flask(__name__)
-CORS(app)
+app.config["MAX_CONTENT_LENGTH"] = MAX_RESUME_BYTES
+
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    if origin.strip()
+]
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
 
-@app.route('/')
-def hello():
-    """
-    Hello world test
-    """
-    return 'Hello, World!'
+class ResumeValidationError(ValueError):
+    """Raised when an uploaded resume is missing or unreadable."""
+
+
+def error_response(message: str, status_code: int):
+    """Return the API's standard error shape."""
+    return jsonify({"error": message}), status_code
+
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_oversized_upload(_error):
+    """Return JSON when Flask rejects an oversized request."""
+    return error_response("The resume must be no larger than 5 MiB.", 413)
 
 
 def parse_resume(uploaded_file) -> str:
-    """
-    Given a werkzeug FileStorage for a PDF resume, extract text,
-    force ASCII only, and return the clean string.
-    """
-
-    # save to temp
-    tmp = os.path.join(os.path.dirname(__file__), 'temp_resume.pdf')
-    uploaded_file.save(tmp)
-
-    text_accum = []
-    try:
-        with open(tmp, 'rb') as pdf_file:
-            reader = PyPDF2.PdfReader(pdf_file)
-            for page in reader.pages:
-                raw = page.extract_text() or ""
-                # normalize → ascii
-                clean = raw.encode('ascii', 'ignore').decode('ascii')
-                text_accum.append(clean)
-    finally:
-        try:
-            os.remove(tmp)
-        except OSError:
-            pass
-
-    return "\n".join(text_accum)
-
-
-def load_letter_style() -> str:
-    """
-    Load the letter style from the format.tex latex file
-    """
-    here = os.path.dirname(__file__)
-    fmt = os.path.join(here, "..", "latex", "format.tex")
-    with open(fmt, "r", encoding="utf-8") as f:
-        return f.read()
-
-
-@app.route('/generate-cover-letter', methods=['POST'])
-def generate_cover_letter():
-    """
-    Generate the cover letter by collecting the information from the resume,
-    job description, and extras, and sending the LLM a prompt
-    """
-
-    job_url = request.form.get('jobName', '')
-    extra_details = request.form.get('extraDetails', '')
-    comments = request.form.get('comments', '')
-    letter_style = load_letter_style()
-
-    resume_text = ""
-    if 'resume' in request.files and request.files['resume'].filename:
-        resume_text = parse_resume(request.files['resume'])
-
-    prompt = Llm.create_prompt(
-        job_url,
-        extra_details,
-        letter_style,
-        comments,
-        resume_text
-    )
-    cover_letter = Llm.generate(prompt)
-
-    return jsonify({
-        "coverLetter": cover_letter
-        .output_text
-        .strip("`")
-        .removeprefix("latex")
-    })
-
-
-@app.route('/compile-latex', methods=['POST'])
-def compile_latex():
-    """
-    Compiles the latex file
-    """
-    data = request.get_json()
-    latex_content = data.get('latex', '')
-
-    if not latex_content:
-        return jsonify({"error": "No LaTeX content provided"}), 400
+    """Extract text from a PDF upload without writing it to disk."""
+    filename = Path(uploaded_file.filename or "").name
+    if Path(filename).suffix.lower() != ".pdf":
+        raise ResumeValidationError("Upload a PDF resume.")
 
     try:
-        # Compile the LaTeX content
-        pdf_path = CompileLatex.compile(latex_content)
+        uploaded_file.stream.seek(0)
+        reader = PdfReader(uploaded_file.stream)
+        if reader.is_encrypted:
+            raise ResumeValidationError("Password-protected PDFs are not supported.")
+        resume_text = "\n".join(
+            page.extract_text() or "" for page in reader.pages
+        ).strip()
+    except (PdfReadError, OSError, ValueError) as error:
+        if isinstance(error, ResumeValidationError):
+            raise
+        raise ResumeValidationError("The uploaded PDF could not be read.") from error
 
-        if not os.path.exists(pdf_path):
-            return jsonify({"error": "PDF file not found. Compilation may have failed."}), 500
-
-        # Send the generated PDF file
-        response = send_file(
-            pdf_path,
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name='cover-letter.pdf'
+    if not resume_text:
+        raise ResumeValidationError(
+            "No selectable text was found in the PDF resume."
         )
-
-        # After sending the file, delete temporary files
-        def remove_temp_files():
-            try:
-                if os.path.exists(pdf_path):
-                    os.remove(pdf_path)
-                log_path = pdf_path.replace('.pdf', '.log')
-                aux_path = pdf_path.replace('.pdf', '.aux')
-                if os.path.exists(log_path):
-                    os.remove(log_path)
-                if os.path.exists(aux_path):
-                    os.remove(aux_path)
-            except IOError as e:
-                print("Error deleting temporary files:", e)
-
-        response.call_on_close(remove_temp_files)
-        return response
-
-    except IOError as e:
-        print(f"Exception during PDF compilation: {e}")
-        return jsonify({"error": str(e)}), 500
+    return resume_text
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def load_letter_template() -> str:
+    """Load the version-controlled LaTeX template."""
+    template_path = Path(__file__).resolve().parents[1] / "latex" / "format.tex"
+    return template_path.read_text(encoding="utf-8")
+
+
+def clean_model_output(output_text: str) -> str:
+    """Remove an optional Markdown fence from otherwise valid LaTeX."""
+    cleaned = output_text.strip()
+    if cleaned.startswith("```"):
+        lines = cleaned.splitlines()
+        if lines and lines[0].strip().lower() in {"```", "```latex", "```tex"}:
+            lines.pop(0)
+        if lines and lines[-1].strip() == "```":
+            lines.pop()
+        cleaned = "\n".join(lines).strip()
+    return cleaned
+
+
+@app.get("/api/health")
+def health():
+    """Report whether the Flask process is running."""
+    return jsonify({"status": "ok"})
+
+
+@app.post("/api/generate-cover-letter")
+# The explicit returns keep each HTTP validation/error path easy to audit.
+# pylint: disable=too-many-return-statements
+def generate_cover_letter():
+    """Generate editable LaTeX from a PDF resume and LinkedIn job URL."""
+    uploaded_resume = request.files.get("resume")
+    job_url = request.form.get("jobUrl", "").strip()
+    extra_details = request.form.get("extraDetails", "").strip()
+    comments = request.form.get("comments", "").strip()
+    tone = request.form.get("tone", "modern").strip().lower()
+
+    if uploaded_resume is None or not uploaded_resume.filename:
+        return error_response("Upload a PDF resume.", 400)
+    if not job_url:
+        return error_response("Enter a LinkedIn job posting URL.", 400)
+    if tone not in SUPPORTED_TONES:
+        return error_response("Choose a supported writing tone.", 400)
+
+    try:
+        Job.get_api_url_from_job_posting_url(job_url)
+        resume_text = parse_resume(uploaded_resume)
+        prompt = Llm.create_prompt(
+            CoverLetterContext(
+                job_url=job_url,
+                extra_details=extra_details,
+                letter_template=load_letter_template(),
+                comments=comments,
+                resume_text=resume_text,
+                tone=tone,
+            )
+        )
+        cover_letter = clean_model_output(Llm.generate(prompt))
+    except (UnsupportedJobUrl, ResumeValidationError, ValueError) as error:
+        return error_response(str(error), 400)
+    except JobScrapingError as error:
+        return error_response(str(error), 502)
+    except LlmConfigurationError as error:
+        return error_response(str(error), 503)
+    except (LlmGenerationError, OpenAIError):
+        return error_response("The cover letter service is temporarily unavailable.", 502)
+
+    if not cover_letter:
+        return error_response("The model did not return a cover letter.", 502)
+    return jsonify({"coverLetter": cover_letter})
+
+
+@app.post("/api/compile-latex")
+def compile_latex():
+    """Compile submitted LaTeX and return a downloadable PDF."""
+    data = request.get_json(silent=True) or {}
+    latex_content = data.get("latex", "")
+    if not isinstance(latex_content, str) or not latex_content.strip():
+        return error_response("No LaTeX content was provided.", 400)
+
+    try:
+        pdf_bytes = CompileLatex.compile(clean_model_output(latex_content))
+    except LatexCompilationError as error:
+        return error_response(str(error), 422)
+
+    return send_file(
+        BytesIO(pdf_bytes),
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="cover-letter.pdf",
+        max_age=0,
+    )
+
+
+if __name__ == "__main__":
+    app.run(debug=os.getenv("FLASK_DEBUG") == "1")
