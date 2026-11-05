@@ -1,12 +1,19 @@
-"""
-Complies LaTex files into PDF
-"""
+"""Compile generated LaTeX into an isolated PDF document."""
 
 # Disable pylint for too few public methods
 # pylint: disable=R0903
 
-import os
+from pathlib import Path
 import subprocess
+import tempfile
+
+
+class LatexCompilationError(RuntimeError):
+    """Raised when XeLaTeX cannot create a PDF."""
+
+
+class LatexCompilationTimeout(LatexCompilationError):
+    """Raised when XeLaTeX exceeds the configured time limit."""
 
 
 class CompileLatex:
@@ -15,43 +22,49 @@ class CompileLatex:
     """
 
     @classmethod
-    def compile(cls, response):
+    def compile(cls, latex_source: str, timeout_seconds: int = 30) -> bytes:
+        """Compile ``latex_source`` and return the PDF bytes.
+
+        Every request receives its own temporary directory. The directory is
+        removed before this method returns, including on compilation failure.
         """
-        Compile the LaTeX file into a PDF.
-        """
-        # Get current working directory
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        if not latex_source or not latex_source.strip():
+            raise LatexCompilationError("No LaTeX content was provided.")
 
-        # Create file paths with absolute paths
-        tex_path = os.path.join(current_dir, "cover-letter.tex")
+        with tempfile.TemporaryDirectory(prefix="auto-cover-letter-") as temp_dir:
+            working_directory = Path(temp_dir)
+            tex_path = working_directory / "cover-letter.tex"
+            pdf_path = working_directory / "cover-letter.pdf"
+            tex_path.write_text(latex_source, encoding="utf-8")
 
-        # Write the LaTeX content to a file
-        with open(tex_path, "w", encoding="utf-8") as f:
-            f.write(response.strip("`").removeprefix("latex"))
+            try:
+                result = subprocess.run(
+                    [
+                        "xelatex",
+                        "-no-shell-escape",
+                        "-halt-on-error",
+                        "-interaction=nonstopmode",
+                        tex_path.name,
+                    ],
+                    cwd=working_directory,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    check=False,
+                    timeout=timeout_seconds,
+                )
+            except FileNotFoundError as error:
+                raise LatexCompilationError(
+                    "XeLaTeX is not installed or is not available on PATH."
+                ) from error
+            except subprocess.TimeoutExpired as error:
+                raise LatexCompilationTimeout(
+                    "LaTeX compilation exceeded the time limit."
+                ) from error
 
-        # Change to the directory where the tex file is located
-        original_dir = os.getcwd()
-        os.chdir(current_dir)
+            if result.returncode != 0 or not pdf_path.exists():
+                raise LatexCompilationError(
+                    "XeLaTeX could not compile the generated document."
+                )
 
-        try:
-            # Run the xelatex command to compile the LaTeX file
-            result = subprocess.run(
-                ["xelatex", "-interaction=nonstopmode", "cover-letter.tex"],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                check=False,
-            )
-
-            # Print output for debugging
-            print("xelatex stdout:", result.stdout)
-            print("xelatex stderr:", result.stderr)
-
-            if result.returncode != 0:
-                print(f"LaTeX compilation failed with return code {result.returncode}")
-        finally:
-            # Return to original directory
-            os.chdir(original_dir)
-
-        # Return the path to the generated PDF
-        return os.path.join(current_dir, "cover-letter.pdf")
+            return pdf_path.read_bytes()

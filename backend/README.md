@@ -1,18 +1,19 @@
-# DataQuest-2025 LLM Backend
-## The OpenAI Backend for our project
+# Backend
 
-![LLM Pylint](https://github.com/raginggoosedev/dataquest-2025/actions/workflows/llm-pylint.yml/badge.svg)
+The Flask API validates PDF uploads, extracts resume text in memory, retrieves
+the LinkedIn job description, requests factual LaTeX from the OpenAI Responses
+API, and compiles reviewed LaTeX into a PDF.
 
-### Installation
+Setup and API documentation live in the [repository README](../README.md).
 
-1. Install uv (linux/mac) `curl -LsSf https://astral.sh/uv/install.sh | sh` (windows) `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
-2. Clone repo `git clone git@github.com:raginggoosedev/dataquest-2025.git`
-3. Enter the LLM directory
+```bash
+uv sync --project backend --extra dev
+uv run --project backend python -m backend.routes.main
+```
 
-### Running/Developing
+Run the backend checks from the repository root:
 
-1. Create a venv using `uv venv` within the LLM directory
-2. Activate using `source .venv/bin/activate`
-3. Sync the required packages `uv sync`
-4. Build your .env with your API key
-5. Get developing!
+```bash
+uv run --project backend pylint backend/llm backend/routes backend/scraping backend/latex
+uv run --project backend pytest backend/tests --cov=backend --cov-config=backend/pyproject.toml --cov-report=term-missing --cov-fail-under=90
+```
