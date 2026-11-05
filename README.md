@@ -56,16 +56,16 @@ before development and later helped where possible with presentation work.
 
 | Contributor | Primary project work |
 | --- | --- |
-| **Nicholas Woo** | React workflow and UX, frontend/backend integration, Flask routes, resume parsing, PDF download flow, loading feedback, and later Linux deployment adaptation |
+| **Nicholas Woo** | React workflow and UX, initial OpenAI client and prompt-generation path, frontend/backend integration, Flask routes, resume parsing, PDF download flow, loading feedback, and later Linux deployment adaptation |
 | **Josh Muszka** | LinkedIn job scraping, LaTeX/PDF pipeline work, integration, and visual improvements |
-| **Michael Quick** | OpenAI integration, backend structure and cleanup, lint automation, integration, and presentation work |
+| **Michael Quick** | Later OpenAI/backend refinement, backend structure and cleanup, lint automation, integration, and presentation work |
 | **Eunsung Kim** | Initial team member and presentation support when available |
 
 Nicholas's original work is visible in the repository history:
 
 - [PR #7](https://github.com/raginggoosedev/auto-cover-letter/pull/7): initial application form and React workflow
 - [PR #13](https://github.com/raginggoosedev/auto-cover-letter/pull/13): selectable style and feedback-based regeneration
-- [PR #18](https://github.com/raginggoosedev/auto-cover-letter/pull/18): API integration, resume parsing, LaTeX compilation, and PDF download
+- [PR #18](https://github.com/raginggoosedev/auto-cover-letter/pull/18): initial OpenAI/prompt path, API integration, resume parsing, LaTeX compilation, and PDF download
 - [PR #19](https://github.com/raginggoosedev/auto-cover-letter/pull/19): asynchronous loading feedback
 - [Deployment commit](https://github.com/raginggoosedev/auto-cover-letter/commit/18a5473dc54f5bd0be7243b89011028f7bdfea6f): same-origin `/api` routing and WSGI deployment entry point
 
